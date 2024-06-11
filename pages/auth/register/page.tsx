@@ -2,12 +2,13 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { registerSchema, mappedRoles } from "@/schemas/authSchema";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
+import { gql, useMutation } from "@apollo/client";
 
 type Inputs = {
   name: string;
@@ -17,6 +18,28 @@ type Inputs = {
   confirmPassword: string;
   rol: string;
 };
+
+const REGISTER_USER = gql`
+  mutation RegisterUser(
+    $name: String!
+    $email: String!
+    $phone: String!
+    $password: String!
+    $rol: String!
+  ) {
+    registerUser(
+      name: $name
+      email: $email
+      phone: $phone
+      password: $password
+      rol: $rol
+    ) {
+      id
+      name
+      email
+    }
+  }
+`;
 
 function RegisterPage() {
   const {
@@ -28,28 +51,32 @@ function RegisterPage() {
   });
 
   const router = useRouter();
+  const [registerUser, { data, loading, error }] = useMutation(REGISTER_USER);
+  const [errorMessage, setErrorMessage] = useState<string>("");
+
   const onSubmit = handleSubmit(async (data) => {
     if (data.password != data.confirmPassword) {
       return alert("El password no es el correcto");
     }
 
-    const res = await fetch("/api/auth/register/register", {
-      method: "POST",
-      body: JSON.stringify({
-        name: data.name,
-        email: data.email,
-        phone: data.phone,
-        password: data.password,
-        rol: data.rol,
-      }),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    try {
+      const result = await registerUser({
+        variables: {
+          name: data.name,
+          email: data.email,
+          phone: data.phone,
+          password: data.password,
+          rol: data.rol,
+        },
+      });
 
-    // if (res.ok) {
-    //   router.push("/auth/login");
-    // }
+      if (result.data) {
+        router.push("/dashboard/page");
+      }
+    } catch (error: any) {
+      console.error(error);
+      setErrorMessage(error.message || "Hubo un error en el registro");
+    }
   });
 
   const rolesOptions = Object.entries(mappedRoles).map(([key, value]) => (
@@ -66,6 +93,9 @@ function RegisterPage() {
         </CardTitle>
       </CardHeader>
       <CardContent>
+        {errorMessage && (
+          <div className="text-red-500 text-xs mb-4">{errorMessage}</div>
+        )}
         <form onSubmit={onSubmit}>
           <div className="grid w-full items-center gap-4">
             <div className="flex flex-col space-y-1.5">
