@@ -26,6 +26,9 @@ export const registerSchema = z.object({
   email: z.string().email({
     message: "Debes poner un correo con el formato nombre@email.com aqui",
   }),
+  phone: z.string().min(10, {
+    message: "Debes poner un telefono valido",
+  }),
   password: z.string().min(5, {
     message: "La contraseña debe ser minimo 5 caracteres",
   }),

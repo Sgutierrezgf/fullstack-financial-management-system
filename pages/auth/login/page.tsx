@@ -22,12 +22,12 @@ function LoginPage() {
     resolver: zodResolver(loginSchema),
   });
 
-  console.log(errors);
-
   return (
     <Card className="w-[350px]">
       <CardHeader>
-        <CardTitle>Inicio de sesion</CardTitle>
+        <CardTitle className="text-slate-200 font-bold text-4xl mb-4">
+          Inicio de sesion
+        </CardTitle>
       </CardHeader>
       <CardContent>
         <form
@@ -37,27 +37,49 @@ function LoginPage() {
         >
           <div className="grid w-full items-center gap-4">
             <div className="flex flex-col space-y-1.5">
-              <Label htmlFor="email">Correo electronico</Label>
+              <Label
+                htmlFor="email"
+                className="text-slate-500 mb-2 block text-sm"
+              >
+                Correo electronico
+              </Label>
               <Input
                 placeholder="nombre@email.com"
                 type="email"
                 id="email"
                 {...register("email")}
+                className="p-3 rounded block mb-2 bg-slate-900 text-slate-300 w-full border-none"
               />
-              {errors.email?.message && <p>{errors.email?.message}</p>}
+              {errors.email?.message && (
+                <span className="text-red-500 text-xs">
+                  {errors.email?.message}
+                </span>
+              )}
             </div>
-            <div className="flex flex-col space-y-1.5">
-              <Label htmlFor="password">Contraseña</Label>
+            <div className="flex flex-col space-y-1.5 mb-5">
+              <Label
+                htmlFor="password"
+                className="text-slate-500 mb-2 block text-sm"
+              >
+                Contraseña
+              </Label>
               <Input
                 placeholder="*****"
                 type="password"
                 id="password"
                 {...register("password")}
+                className="p-3 rounded block mb-2 bg-slate-900 text-slate-300 w-full border-none"
               />
-              {errors.password?.message && <p>{errors.password?.message}</p>}
+              {errors.password?.message && (
+                <span className="text-red-500 text-xs">
+                  {errors.password?.message}
+                </span>
+              )}
             </div>
           </div>
-          <Button>Iniciar sesion</Button>
+          <Button className="w-full bg-blue-500 text-white p-3 rounded-lg">
+            Iniciar sesion
+          </Button>
         </form>
       </CardContent>
     </Card>
